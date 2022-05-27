@@ -23,8 +23,14 @@ def assert_events(*args, **kwargs): # real signature unknown
     raise Exception("assert_events")
 
 def assert_fact(*args, **kwargs): # real signature unknown
-    r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
-    print( json.dumps(r.json(), indent=2) )
+    # r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
+    # print( json.dumps(r.json(), indent=2) )
+
+    # {
+    #   "sid": "0",
+    #   "id": "sid-0",
+    #   "$s": 1
+    # }
 
     print(args[0])
     print(args[1])
@@ -50,8 +56,11 @@ def complete_get_queued_messages(*args, **kwargs): # real signature unknown
     pass
 
 def create_ruleset(*args, **kwargs): # real signature unknown
-    r = requests.post(HOST + '/create-ruleset', data={ "name": args[0], "data": args[1] })
-    print( json.dumps(r.json(), indent=2) )
+    # {
+    #   "sid": "0",
+    #   "id": "sid-0",
+    #   "$s": 1
+    # }
     print(args[0])
     print(args[1])
     return 1
