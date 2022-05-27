@@ -46,8 +46,18 @@ def assert_timers(*args, **kwargs): # real signature unknown
 def cancel_timer(*args, **kwargs): # real signature unknown
     pass
 
+count = 0
+
 def complete_and_start_action(*args, **kwargs): # real signature unknown
-    pass
+    print(args, kwargs)
+    if count==1:
+        return json.dumps({'r_4': {'m': {'payload': {'text': 'hello'}}}})
+    elif count == 2:
+        return json.dumps({"r_5":{"m":{"payload": {"text": "hello"}}}})
+    else:
+        return None
+
+
 
 def complete_get_idle_state(*args, **kwargs): # real signature unknown
     pass
@@ -116,7 +126,8 @@ def start_timer(*args, **kwargs): # real signature unknown
     pass
 
 def update_state(*args, **kwargs): # real signature unknown
-    pass
+    global count
+    count = count+1
 
 # classes
 
