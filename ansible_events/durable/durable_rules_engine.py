@@ -17,10 +17,10 @@ def abandon_action(*args, **kwargs): # real signature unknown
     pass
 
 def assert_event(*args, **kwargs): # real signature unknown
-    pass
+    return (0,1)
 
 def assert_events(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("assert_events")
 
 def assert_fact(*args, **kwargs): # real signature unknown
     r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
@@ -62,13 +62,13 @@ def delete_ruleset(*args, **kwargs): # real signature unknown
     pass
 
 def delete_state(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("delete_state")
 
 def get_events(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("get_events")
 
 def get_facts(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("get_facts")
 
 def get_state(*args, **kwargs): # real signature unknown
     pass
@@ -77,7 +77,7 @@ def renew_action_lease(*args, **kwargs): # real signature unknown
     pass
 
 def retract_fact(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("retract_fact")
 
 def retract_facts(*args, **kwargs): # real signature unknown
     pass
@@ -98,10 +98,10 @@ def set_store_message_callback(*args, **kwargs): # real signature unknown
     pass
 
 def start_action(*args, **kwargs): # real signature unknown
-    pass
+    raise Exception("start_action")
 
 def start_action_for_state(*args, **kwargs): # real signature unknown
-    pass
+    return ('{ "sid":"0", "id":"sid-0", "$s":1}', '{"r_0":{"m":{"subject": "World"}}}', 1)
 
 def start_timer(*args, **kwargs): # real signature unknown
     pass
