@@ -1,4 +1,4 @@
-from durable.lang import ruleset, rule, m, c
+from ansible_events.durable.lang import ruleset, rule, m, c
 import asyncio
 import logging
 from ansible_events.condition_types import (

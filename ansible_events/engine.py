@@ -1,7 +1,6 @@
 import os
 import runpy
 import asyncio
-import durable.lang
 import select
 import traceback
 import logging
@@ -12,6 +11,7 @@ from queue import Queue
 from pprint import pprint, pformat
 
 import ansible_events.rule_generator as rule_generator
+from ansible_events import durable
 from ansible_events.durability import provide_durability
 from ansible_events.messages import Shutdown
 from ansible_events.util import substitute_variables, json_count

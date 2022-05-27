@@ -1,6 +1,6 @@
 
 
-from durable.lang import m, c
+from ansible_events.durable.lang import m, c
 
 from ansible_events.condition_parser import parse_condition, Identifier, String, OperatorExpression, condition
 from ansible_events.rule_generator import visit_condition

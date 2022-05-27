@@ -1,5 +1,7 @@
-from durable.lang import m, c, assert_fact, ruleset, rule, when_all, post
-import durable.lang
+from ansible_events import durable
+from ansible_events.durable.lang import m, c, assert_fact, ruleset, rule, when_all, post
+import ansible_events.durable
+import ansible_events.durable.lang
 import yaml
 import os
 import asyncio
