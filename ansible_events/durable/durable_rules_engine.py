@@ -11,7 +11,7 @@ import json
 import requests
 
 
-HOST = "https://postman-echo.com/post"
+HOST = "https://6290a0b427f4ba1c65bdaa54.mockapi.io/api/v1"
 
 def abandon_action(*args, **kwargs): # real signature unknown
     pass
@@ -23,8 +23,13 @@ def assert_events(*args, **kwargs): # real signature unknown
     pass
 
 def assert_fact(*args, **kwargs): # real signature unknown
+    r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
+    print( json.dumps(r.json(), indent=2) )
+
     print(args[0])
     print(args[1])
+
+    return (0,1)
 
 def assert_facts(*args, **kwargs): # real signature unknown
     pass
@@ -45,10 +50,11 @@ def complete_get_queued_messages(*args, **kwargs): # real signature unknown
     pass
 
 def create_ruleset(*args, **kwargs): # real signature unknown
-    # r = requests.post(HOST, data={ "name": args[0], "data": args[1] })
-    # print( json.dumps(r.json(), indent=2)  )
+    r = requests.post(HOST + '/create-ruleset', data={ "name": args[0], "data": args[1] })
+    print( json.dumps(r.json(), indent=2) )
     print(args[0])
     print(args[1])
+    return 1
 
 
 
