@@ -23,8 +23,8 @@ def assert_events(*args, **kwargs): # real signature unknown
     raise Exception("assert_events")
 
 def assert_fact(*args, **kwargs): # real signature unknown
-    # r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
-    # print( json.dumps(r.json(), indent=2) )
+    r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
+    print( json.dumps(r.json(), indent=2) )
 
     # {
     #   "sid": "0",
@@ -49,7 +49,9 @@ def cancel_timer(*args, **kwargs): # real signature unknown
 count = 0
 
 def complete_and_start_action(*args, **kwargs): # real signature unknown
-    print(args, kwargs)
+    print("complete_and_start_action", args, kwargs)
+
+
     if count==1:
         return json.dumps({'r_4': {'m': {'payload': {'text': 'hello'}}}})
     elif count == 2:
@@ -120,12 +122,15 @@ def start_action(*args, **kwargs): # real signature unknown
     raise Exception("start_action")
 
 def start_action_for_state(*args, **kwargs): # real signature unknown
-    return ('{ "sid":"0", "id":"sid-0", "$s":1}', '{"r_0":{"m":{"subject": "World"}}}', 1)
+    print("start_action_for_state", args, kwargs)
+    return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps({'r_3': {'m': {'payload': {'text': 'hello'}}}}), 1)
 
 def start_timer(*args, **kwargs): # real signature unknown
     pass
 
 def update_state(*args, **kwargs): # real signature unknown
+    print("update_state", args, kwargs)
+
     global count
     count = count+1
 

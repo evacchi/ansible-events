@@ -110,6 +110,8 @@ def make_fn(
     def fn(c):
         logger = logging.getLogger()
         logger.info(f"calling {ansible_rule.name}")
+
+        print("RULE: ", ansible_rule)
         add_to_plan(
             ruleset,
             ansible_rule.action.action,

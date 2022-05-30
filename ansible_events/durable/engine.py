@@ -457,6 +457,7 @@ class Ruleset(object):
 
     def _flush_actions(self, state, result_container, state_offset, complete):
         while 'message' in result_container:
+            print("RES", result_container)
             action_name = None
             for action_name, message in result_container['message'].items():
                 break
@@ -473,9 +474,17 @@ class Ruleset(object):
                     complete(e, None)
                 else:
                     try:
-                        durable_rules_engine.update_state(self._handle, json.dumps(c.s._d, ensure_ascii=False))
+                        j = json.dumps(c.s._d, ensure_ascii=False);
+                        print("HANDLE", self._handle)
+                        print("JSON", j)
+
+                        next = durable_rules_engine.update_state(self._handle, j)
+
+                        print("NEXT_STATE", next)
 
                         new_result = durable_rules_engine.complete_and_start_action(self._handle, c._handle)
+                        print("NEW_RESULT", self._handle, c._handle, new_result)
+
                         if new_result:
                             result_container['message'] = json.loads(new_result)
                         else:
@@ -499,6 +508,7 @@ class Ruleset(object):
                         except:
                             pass
 
+            print("ACTION", action_name)
             self._actions[action_name].run(c, action_callback)
 
     def do_actions(self, state_handle, complete):
