@@ -162,7 +162,8 @@ def delete_state(*args, **kwargs):  # real signature unknown
 
 
 def get_events(*args, **kwargs):  # real signature unknown
-    raise Exception("get_events")
+    logging.warning("get_events() not yet implemented. Ignoring.")
+    return "{}"
 
 
 def get_facts(*args, **kwargs):  # real signature unknown
