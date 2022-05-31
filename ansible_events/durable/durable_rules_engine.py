@@ -30,6 +30,7 @@ def assert_fact(*args, **kwargs): # real signature unknown
     r = requests.post(HOST + '/rules-durable-executors/'+args[0]+'/process', json=json.loads(args[1]))
     LAST_RESP = r.json()
     LAST_RESP.reverse()
+    LAST_RESP.pop()
 
     print( json.dumps(r.json(), indent=2) )
 
