@@ -1,4 +1,5 @@
 import json
+import logging
 
 import requests
 
@@ -20,15 +21,25 @@ class DurableRulesEngine:
         req = {ruleset_name: json.loads(ruleset_string)}
 
         r = requests.post(self.__host + '/create-durable-rules-executor', json=req)
+        if r.status_code != 200:
+            raise Exception(f"Invalid status code: {r.status_code} - {r.reason}\n{json.loads(r.content)['details']}")
 
         id = r.text
         print(ruleset_name)
         print(ruleset_string)
         return id
 
-    def assert_fact(self, session_id, serialized_fact):  # real signature unknown
-        r = requests.post(self.__host + '/rules-durable-executors/' + session_id + '/process',
+    def assert_event(self, session_id, serialized_fact):
+        logging.warning("assert_event not yet implemented: using assert_fact")
+        return self.assert_fact(session_id, serialized_fact)
+
+    def assert_fact(self, session_id, serialized_fact):
+        r = requests.post(f"{self.__host}/rules-durable-executors/{session_id}/process",
                           json=json.loads(serialized_fact))
+
+        if r.status_code != 200:
+            raise Exception(f"Invalid status code: {r.status_code} - {r.reason}")
+
         self.__last_resp = r.json()
         self.__last_resp.reverse()
         # self.__last_resp.pop()
@@ -106,8 +117,8 @@ def abandon_action(*args, **kwargs):  # real signature unknown
     pass
 
 
-def assert_event(*args, **kwargs):  # real signature unknown
-    return (0, 1)
+def assert_event(session_id, serialized_fact):
+    return __instance.assert_fact(session_id, serialized_fact)
 
 
 def assert_events(*args, **kwargs):  # real signature unknown
