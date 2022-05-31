@@ -4,8 +4,11 @@ import requests
 
 
 class DurableRulesEngine:
-    host = "http://localhost:8080"
-    last_resp = None
+    __host = None
+    __last_resp = None
+
+    def __init__(self, host):
+        self.__host = host
 
     def create_ruleset(self, ruleset_name, ruleset_string):  # real signature unknown
         # {
@@ -16,7 +19,7 @@ class DurableRulesEngine:
 
         req = {ruleset_name: json.loads(ruleset_string)}
 
-        r = requests.post(self.host + '/create-durable-rules-executor', json=req)
+        r = requests.post(self.__host + '/create-durable-rules-executor', json=req)
 
         id = r.text
         print(ruleset_name)
@@ -24,11 +27,11 @@ class DurableRulesEngine:
         return id
 
     def assert_fact(self, session_id, serialized_fact):  # real signature unknown
-        r = requests.post(self.host + '/rules-durable-executors/' + session_id + '/process',
+        r = requests.post(self.__host + '/rules-durable-executors/' + session_id + '/process',
                           json=json.loads(serialized_fact))
-        self.last_resp = r.json()
-        self.last_resp.reverse()
-        self.last_resp.pop()
+        self.__last_resp = r.json()
+        self.__last_resp.reverse()
+        self.__last_resp.pop()
 
         print(json.dumps(r.json(), indent=2))
 
@@ -47,7 +50,7 @@ class DurableRulesEngine:
         print("start_action_for_state", handle)
 
         try:
-            resp = self.last_resp.pop()
+            resp = self.__last_resp.pop()
         except:
             return None
 
@@ -72,7 +75,7 @@ class DurableRulesEngine:
         #     return None
 
         try:
-            resp = self.last_resp.pop()
+            resp = self.__last_resp.pop()
         except:
             return None
 
@@ -85,9 +88,6 @@ class DurableRulesEngine:
         return json.dumps(new_resp)
 
 
-SINGLETON = DurableRulesEngine()
-
-
 class error(Exception):
     # no doc
     def __init__(self, *args, **kwargs):  # real signature unknown
@@ -95,6 +95,11 @@ class error(Exception):
 
     __weakref__ = property(lambda self: object(), lambda self, v: None, lambda self: None)  # default
     """list of weak references to the object (if defined)"""
+
+
+# exported methods
+
+__instance = DurableRulesEngine("http://localhost:8080")
 
 
 def abandon_action(*args, **kwargs):  # real signature unknown
@@ -110,7 +115,7 @@ def assert_events(*args, **kwargs):  # real signature unknown
 
 
 def assert_fact(session_id, serialized_fact):
-    return SINGLETON.assert_fact(session_id, serialized_fact)
+    return __instance.assert_fact(session_id, serialized_fact)
 
 
 def assert_facts(*args, **kwargs):  # real signature unknown
@@ -134,7 +139,7 @@ def complete_get_queued_messages(*args, **kwargs):  # real signature unknown
 
 
 def create_ruleset(ruleset_name, ruleset_string):
-    return SINGLETON.create_ruleset(ruleset_name, ruleset_string)
+    return __instance.create_ruleset(ruleset_name, ruleset_string)
 
 
 def delete_ruleset(*args, **kwargs):  # real signature unknown
@@ -194,11 +199,11 @@ def start_action(*args, **kwargs):
 
 
 def start_action_for_state(handle, state_handle):
-    return SINGLETON.start_action_for_state(handle)
+    return __instance.start_action_for_state(handle)
 
 
 def complete_and_start_action(handle, context_handle):
-    return SINGLETON.complete_and_start_action(handle)
+    return __instance.complete_and_start_action(handle)
 
 
 def start_timer(*args, **kwargs):  # real signature unknown
