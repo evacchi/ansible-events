@@ -31,7 +31,7 @@ class DurableRulesEngine:
                           json=json.loads(serialized_fact))
         self.__last_resp = r.json()
         self.__last_resp.reverse()
-        self.__last_resp.pop()
+        # self.__last_resp.pop()
 
         print(json.dumps(r.json(), indent=2))
 
@@ -56,12 +56,12 @@ class DurableRulesEngine:
 
         # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
 
-        rule_name = resp["ruleName"]
-        facts = resp["facts"]
+        # rule_name = resp["ruleName"]
+        # facts = resp["facts"]
+        #
+        # new_resp = {rule_name: facts}
 
-        new_resp = {rule_name: facts}
-
-        return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps(new_resp), handle)
+        return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps(resp), handle)
 
     def complete_and_start_action(self, handle):  # real signature unknown
         print("complete_and_start_action", handle)
@@ -79,13 +79,13 @@ class DurableRulesEngine:
         except:
             return None
 
-        rule_name = resp["ruleName"]
-        facts = resp["facts"]
-
-        new_resp = {rule_name: facts}
+        # rule_name = resp["ruleName"]
+        # facts = resp["facts"]
+        #
+        # new_resp = {rule_name: facts}
 
         # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
-        return json.dumps(new_resp)
+        return json.dumps(resp)
 
 
 class error(Exception):
