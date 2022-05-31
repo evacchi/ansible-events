@@ -29,6 +29,7 @@ def assert_fact(*args, **kwargs): # real signature unknown
     global LAST_RESP
     r = requests.post(HOST + '/rules-durable-executors/'+args[0]+'/process', json=json.loads(args[1]))
     LAST_RESP = r.json()
+    LAST_RESP.reverse()
 
     print( json.dumps(r.json(), indent=2) )
 
@@ -156,7 +157,10 @@ def start_action_for_state(*args, **kwargs): # real signature unknown
     print("start_action_for_state", args, kwargs)
 
     handle = args[0]
-    resp = LAST_RESP.pop()
+    try:
+        resp = LAST_RESP.pop()
+    except:
+        return None
 
 
     # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
