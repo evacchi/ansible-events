@@ -22,7 +22,8 @@ class DurableRulesEngine:
 
         r = requests.post(self.__host + '/create-durable-rules-executor', json=req)
         if r.status_code != 200:
-            raise Exception(f"Invalid status code: {r.status_code} - {r.reason}\n{json.loads(r.content)['details']}")
+            raise Exception(f"Invalid status code: {r.status_code} - {r.reason}\n"
+                            + json.loads(r.content)['details'])
 
         id = r.text
         print(ruleset_name)
@@ -42,7 +43,6 @@ class DurableRulesEngine:
 
         self.__last_resp = r.json()
         self.__last_resp.reverse()
-        # self.__last_resp.pop()
 
         print(json.dumps(r.json(), indent=2))
 
@@ -65,37 +65,15 @@ class DurableRulesEngine:
         except:
             return None
 
-        # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
-
-        # rule_name = resp["ruleName"]
-        # facts = resp["facts"]
-        #
-        # new_resp = {rule_name: facts}
-
         return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps(resp), handle)
 
     def complete_and_start_action(self, handle):  # real signature unknown
-        print("complete_and_start_action", handle)
-
-        #
-        # if count==1:
-        #     return json.dumps({'r_4': {'m': {'payload': {'text': 'hello'}}}})
-        # elif count == 2:
-        #     return json.dumps({"r_5":{"m":{"payload": {"text": "hello"}}}})
-        # else:
-        #     return None
-
+        logging.info("complete_and_start_action", handle)
         try:
             resp = self.__last_resp.pop()
         except:
             return None
 
-        # rule_name = resp["ruleName"]
-        # facts = resp["facts"]
-        #
-        # new_resp = {rule_name: facts}
-
-        # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
         return json.dumps(resp)
 
 
