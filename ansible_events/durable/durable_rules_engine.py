@@ -11,7 +11,8 @@ import json
 import requests
 
 
-HOST = "https://6290a0b427f4ba1c65bdaa54.mockapi.io/api/v1"
+# HOST = "https://6290a0b427f4ba1c65bdaa54.mockapi.io/api/v1"
+HOST = "http://localhost:8080"
 
 def abandon_action(*args, **kwargs): # real signature unknown
     pass
@@ -23,7 +24,7 @@ def assert_events(*args, **kwargs): # real signature unknown
     raise Exception("assert_events")
 
 def assert_fact(*args, **kwargs): # real signature unknown
-    r = requests.post(HOST + '/assert-fact', data={ "name": args[0], "data": args[1] })
+    r = requests.post(HOST + '/rules-durable-executors/'+args[0]+'/process', json=json.loads(args[1]))
     print( json.dumps(r.json(), indent=2) )
 
     # {
@@ -35,7 +36,7 @@ def assert_fact(*args, **kwargs): # real signature unknown
     print(args[0])
     print(args[1])
 
-    return (0,1)
+    return (0,args[0])
 
 def assert_facts(*args, **kwargs): # real signature unknown
     pass
@@ -73,9 +74,17 @@ def create_ruleset(*args, **kwargs): # real signature unknown
     #   "id": "sid-0",
     #   "$s": 1
     # }
+
+    req = { args[0]: json.loads(args[1]) }
+
+
+    r = requests.post(HOST + '/create-durable-rules-executor', json=req)
+
+
+    id = r.text
     print(args[0])
     print(args[1])
-    return 1
+    return id
 
 
 
