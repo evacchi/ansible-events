@@ -13,6 +13,8 @@ import requests
 
 # HOST = "https://6290a0b427f4ba1c65bdaa54.mockapi.io/api/v1"
 HOST = "http://localhost:8080"
+LAST_RESP = None
+
 
 def abandon_action(*args, **kwargs): # real signature unknown
     pass
@@ -24,7 +26,10 @@ def assert_events(*args, **kwargs): # real signature unknown
     raise Exception("assert_events")
 
 def assert_fact(*args, **kwargs): # real signature unknown
+    global LAST_RESP
     r = requests.post(HOST + '/rules-durable-executors/'+args[0]+'/process', json=json.loads(args[1]))
+    LAST_RESP = r.json()
+
     print( json.dumps(r.json(), indent=2) )
 
     # {
@@ -52,14 +57,30 @@ count = 0
 def complete_and_start_action(*args, **kwargs): # real signature unknown
     print("complete_and_start_action", args, kwargs)
 
+    #
+    # if count==1:
+    #     return json.dumps({'r_4': {'m': {'payload': {'text': 'hello'}}}})
+    # elif count == 2:
+    #     return json.dumps({"r_5":{"m":{"payload": {"text": "hello"}}}})
+    # else:
+    #     return None
 
-    if count==1:
-        return json.dumps({'r_4': {'m': {'payload': {'text': 'hello'}}}})
-    elif count == 2:
-        return json.dumps({"r_5":{"m":{"payload": {"text": "hello"}}}})
-    else:
+    global LAST_RESP
+    print("start_action_for_state", args, kwargs)
+
+    handle = args[0]
+    try:
+        resp = LAST_RESP.pop()
+    except:
         return None
 
+    rule_name = resp["ruleName"]
+    facts = resp["facts"]
+
+    new_resp = {rule_name: facts}
+
+    # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
+    return json.dumps(new_resp)
 
 
 def complete_get_idle_state(*args, **kwargs): # real signature unknown
@@ -131,8 +152,21 @@ def start_action(*args, **kwargs): # real signature unknown
     raise Exception("start_action")
 
 def start_action_for_state(*args, **kwargs): # real signature unknown
+    global LAST_RESP
     print("start_action_for_state", args, kwargs)
-    return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps({'r_3': {'m': {'payload': {'text': 'hello'}}}}), 1)
+
+    handle = args[0]
+    resp = LAST_RESP.pop()
+
+
+    # {'r_3': {'m': {'payload': {'text': 'hello'}}}}
+
+    rule_name = resp["ruleName"]
+    facts = resp["facts"]
+
+    new_resp = {rule_name: facts}
+
+    return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps(new_resp), handle)
 
 def start_timer(*args, **kwargs): # real signature unknown
     pass
