@@ -39,7 +39,9 @@ class DurableRulesEngine:
                           json=json.loads(serialized_fact))
 
         if r.status_code != 200:
-            raise Exception(f"Invalid status code: {r.status_code} - {r.reason}")
+            raise Exception(
+                f"Invalid status code: {r.status_code} - {r.reason}\n"
+                + json.loads(r.content)['details'])
 
         self.__last_resp = r.json()
         self.__last_resp.reverse()
