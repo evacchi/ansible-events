@@ -1,5 +1,6 @@
-import requests
 import time
+
+import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 
 
@@ -20,17 +21,21 @@ def main(queue, args):
                     dict(
                         url_check=dict(
                             url=url,
-                            status="up" if response.status_code == 200 else "down",
+                            status="up"
+                            if response.status_code == 200
+                            else "down",
                             status_code=response.status_code,
                         ),
                         meta=dict(time=time.time()),
                     )
                 )
 
-            except (ConnectionError, ReadTimeout) as e:
+            except (ConnectionError, ReadTimeout):
                 queue.put(
                     dict(
-                        url_check=dict(url=url, status="down", status_code=None),
+                        url_check=dict(
+                            url=url, status="down", status_code=None
+                        ),
                         meta=dict(time=time.time()),
                     )
                 )

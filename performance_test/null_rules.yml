@@ -7,6 +7,6 @@
         limit: 5
   rules:
     - name:
-      condition: +i
+      condition: +event.i
       action:
         none:

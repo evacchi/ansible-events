@@ -66,9 +66,12 @@ Ready to contribute? Here's how to set up `ansible_events` for local development
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv ansible_events
     $ cd ansible_events/
-    $ python setup.py develop
+    $ python3.9 -m venv venv
+    $ source venv/bin/activate
+    $ pip install -e .
+    $ pip install -r requirements_dev.txt
+    $ ansible-galaxy collection install benthomasson.eda
 
 4. Create a branch for local development::
 
@@ -80,7 +83,7 @@ Ready to contribute? Here's how to set up `ansible_events` for local development
    tests, including testing other Python versions with tox::
 
     $ flake8 ansible_events tests
-    $ python setup.py test or pytest
+    $ pytest
     $ tox
 
    To get flake8 and tox, just pip install them into your virtualenv.
@@ -93,6 +96,47 @@ Ready to contribute? Here's how to set up `ansible_events` for local development
 
 7. Submit a pull request through the GitHub website.
 
+Git pre-commit hooks (optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To automatically run linters and code formatter you may use
+`git pre-commit hooks <https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks>`_.
+This project provides a configuration for `pre-commit <https://pre-commit.com/>`_
+framework to automatically setup hooks for you.
+
+1. First install the ``pre-commit`` tool:
+
+  a. Into your virtual environment:
+
+     .. code-block:: console
+
+         (venv) $ pip install pre-commit
+
+  b. Into your user directory:
+
+     .. code-block:: console
+
+         $ pip install --user pre-commit
+
+  c. Via ``pipx`` tool:
+
+     .. code-block:: console
+
+         $ pipx install pre-commit
+
+2. Then generate git pre-commit hooks:
+
+  .. code-block:: console
+
+      $ pre-commit install
+
+You may run pre-commit manually on all tracked files by calling:
+
+.. code-block:: console
+
+    $ pre-commit run --all-files
+
+
 Pull Request Guidelines
 -----------------------
 
@@ -102,9 +146,7 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/benthomasson/ansible_events/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.9
 
 Tips
 ----
@@ -125,4 +167,14 @@ $ bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+
+Releasing
+---------
+
+A reminder for the maintainers on how to deploy.
+Make sure all your changes are committed (including an entry in HISTORY.rst).
+Then run::
+
+$ python -m build
+$ twine upload dist/*
+

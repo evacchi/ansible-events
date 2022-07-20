@@ -1,39 +1,56 @@
-import durable.lang
-
-from typing import Dict, List, Callable
-import ansible_runner
-import shutil
-import tempfile
-import os
-import yaml
+import asyncio
+import concurrent.futures
 import glob
 import json
-import dpath.util
-import sys
 import logging
+import os
+import shutil
+import sys
+import tempfile
+import uuid
+from functools import partial
 from pprint import pprint
+from typing import Callable, Dict, List, Optional
+
+import ansible_runner
+import dpath.util
+import durable.lang
+import yaml
+
+from .collection import find_playbook, has_playbook, split_collection_name
+from .conf import settings
+from .exception import ShutdownException
 from .util import get_horizontal_rule
-from .collection import split_collection_name, has_playbook, find_playbook
-
-from typing import Optional
 
 
-def none(inventory: Dict, hosts: List, variables: Dict, facts: Dict, ruleset: str):
-    pass
+async def none(
+    event_log,
+    inventory: Dict,
+    hosts: List,
+    variables: Dict,
+    facts: Dict,
+    ruleset: str,
+):
+    await event_log.put(dict(type="Action", action="noop"))
 
 
-def debug(**kwargs):
+async def debug(event_log, **kwargs):
     print(get_horizontal_rule("="))
+    print("context:")
     pprint(durable.lang.c.__dict__)
     print(get_horizontal_rule("="))
+    print("facts:")
     pprint(durable.lang.get_facts(kwargs["ruleset"]))
     print(get_horizontal_rule("="))
+    print("kwargs:")
     pprint(kwargs)
     print(get_horizontal_rule("="))
     sys.stdout.flush()
+    await event_log.put(dict(type="Action", action="debug"))
 
 
-def print_event(
+async def print_event(
+    event_log,
     inventory: Dict,
     hosts: List,
     variables: Dict,
@@ -50,9 +67,11 @@ def print_event(
     else:
         print_fn(variables["event"])
     sys.stdout.flush()
+    await event_log.put(dict(type="Action", action="print_event"))
 
 
-def assert_fact(
+async def assert_fact(
+    event_log,
     inventory: Dict,
     hosts: List,
     variables: Dict,
@@ -63,21 +82,37 @@ def assert_fact(
     logger = logging.getLogger()
     logger.debug(f"assert_fact {ruleset} {fact}")
     durable.lang.assert_fact(ruleset, fact)
+    await event_log.put(dict(type="Action", action="assert_fact"))
 
 
-def retract_fact(
-    inventory: Dict, hosts: List, variables: Dict, facts: Dict, ruleset: str, fact: Dict
+async def retract_fact(
+    event_log,
+    inventory: Dict,
+    hosts: List,
+    variables: Dict,
+    facts: Dict,
+    ruleset: str,
+    fact: Dict,
 ):
     durable.lang.retract_fact(ruleset, fact)
+    await event_log.put(dict(type="Action", action="retract_fact"))
 
 
-def post_event(
-    inventory: Dict, hosts: List, variables: Dict, facts: Dict, ruleset: str, fact: Dict
+async def post_event(
+    event_log,
+    inventory: Dict,
+    hosts: List,
+    variables: Dict,
+    facts: Dict,
+    ruleset: str,
+    event: Dict,
 ):
-    durable.lang.post(ruleset, fact)
+    durable.lang.post(ruleset, event)
+    await event_log.put(dict(type="Action", action="post_event"))
 
 
-def run_playbook(
+async def run_playbook(
+    event_log,
     inventory: Dict,
     hosts: List,
     variables: Dict,
@@ -113,19 +148,49 @@ def run_playbook(
     os.mkdir(os.path.join(temp, "project"))
 
     if os.path.exists(name):
-        shutil.copy(name, os.path.join(temp, "project", name))
+        playbook_name = os.path.basename(name)
+        shutil.copy(name, os.path.join(temp, "project", playbook_name))
+        if copy_files:
+            shutil.copytree(
+                os.path.dirname(os.path.abspath(name)),
+                os.path.join(temp, "project"),
+                dirs_exist_ok=True,
+            )
     elif has_playbook(*split_collection_name(name)):
-        shutil.copy(find_playbook(*split_collection_name(name)), os.path.join(temp, "project", name))
+        playbook_name = name
+        shutil.copy(
+            find_playbook(*split_collection_name(name)),
+            os.path.join(temp, "project", name),
+        )
     else:
         raise Exception(f"Could not find a playbook for {name}")
 
-    if copy_files:
-        shutil.copytree(os.path.dirname(os.path.abspath(name)), os.path.join(temp, "project"), dirs_exist_ok=True)
-
     host_limit = ",".join(hosts)
 
-    ansible_runner.run(
-        playbook=name, private_data_dir=temp, limit=host_limit, verbosity=verbosity
+    job_id = str(uuid.uuid4())
+
+    await event_log.put(
+        dict(type="Job", job_id=job_id, ansible_events_id=settings.identifier)
+    )
+
+    def event_callback(event, *args, **kwargs):
+        event["job_id"] = job_id
+        event["ansible_events_id"] = settings.identifier
+        event_log.put_nowait(dict(type="AnsibleEvent", event=event))
+
+    loop = asyncio.get_running_loop()
+    task_pool = concurrent.futures.ThreadPoolExecutor()
+
+    await loop.run_in_executor(
+        task_pool,
+        partial(
+            ansible_runner.run,
+            playbook=playbook_name,
+            private_data_dir=temp,
+            limit=host_limit,
+            verbosity=verbosity,
+            event_handler=event_callback,
+        ),
     )
 
     if assert_facts or post_events:
@@ -140,6 +205,19 @@ def run_playbook(
                 durable.lang.assert_fact(ruleset, fact)
             if post_events:
                 durable.lang.post(ruleset, fact)
+    await event_log.put(dict(type="Action", action="run_playbook"))
+
+
+async def shutdown(
+    event_log,
+    inventory: Dict,
+    hosts: List,
+    variables: Dict,
+    facts: Dict,
+    ruleset: str,
+):
+    await event_log.put(dict(type="Action", action="shutdown"))
+    raise ShutdownException()
 
 
 actions: Dict[str, Callable] = dict(
@@ -150,4 +228,5 @@ actions: Dict[str, Callable] = dict(
     retract_fact=retract_fact,
     post_event=post_event,
     run_playbook=run_playbook,
+    shutdown=shutdown,
 )

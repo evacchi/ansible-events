@@ -5,11 +5,15 @@ import ansible_events.durable.lang
 import yaml
 import os
 import asyncio
-import pytest
+import os
 from queue import Queue
 
-from ansible_events.rules_parser import parse_rule_sets
+import durable.lang
+import pytest
+import yaml
+
 from ansible_events.rule_generator import generate_rulesets
+from ansible_events.rules_parser import parse_rule_sets
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,11 +48,16 @@ def test_m():
     assert (
         (m.x == "lives") & (m.y == "water") & (m.subject == c.first.subject)
     ).define() == {
-        "$and": [{"x": "lives"}, {"y": "water"}, {"subject": {"first": "subject"}}]
+        "$and": [
+            {"x": "lives"},
+            {"y": "water"},
+            {"subject": {"first": "subject"}},
+        ]
     }
     assert (
         when_all(
-            c.first << m.t == "purchase", c.second << m.location != c.first.location
+            c.first << m.t == "purchase",
+            c.second << m.location != c.first.location,
         )
     ).define() == {
         "all": [
@@ -112,7 +121,11 @@ def test_assert_facts():
 
         @when_all(+m.subject.x)
         def output(c):
-            print("Fact: {0} {1} {2}".format(c.m.subject.x, c.m.predicate, c.m.object))
+            print(
+                "Fact: {0} {1} {2}".format(
+                    c.m.subject.x, c.m.predicate, c.m.object
+                )
+            )
 
     assert_fact(
         "test_assert_facts",
@@ -125,7 +138,7 @@ def test_parse_rules():
     with open("rules.yml") as f:
         data = yaml.safe_load(f.read())
 
-    rulesets = parse_rule_sets(data)
+    parse_rule_sets(data)
 
 
 @pytest.mark.asyncio
@@ -141,7 +154,9 @@ async def test_generate_rules():
     ruleset_queue_plans = [
         (ruleset, Queue(), asyncio.Queue()) for ruleset in rulesets
     ]
-    durable_rulesets = generate_rulesets(ruleset_queue_plans, dict(), inventory)
+    durable_rulesets = generate_rulesets(
+        ruleset_queue_plans, dict(), inventory
+    )
 
     print(durable_rulesets[0][0].define())
 
@@ -165,19 +180,17 @@ async def test_generate_rules_multiple_conditions_any():
     ruleset_queue_plans = [
         (ruleset, Queue(), asyncio.Queue()) for ruleset in rulesets
     ]
-    durable_rulesets = generate_rulesets(ruleset_queue_plans, dict(), inventory)
+    durable_rulesets = generate_rulesets(
+        ruleset_queue_plans, dict(), inventory
+    )
 
     print(durable_rulesets[0][0].define())
 
-    post(
-        "Demo rules multiple conditions any",
-        {"payload": {"provisioningState": "Succeeded"}},
-    )
-    assert ruleset_queue_plans[0][2].get_nowait()[1] == "slack"
-    post(
-        "Demo rules multiple conditions any", {"payload": {"provisioningState": "Deleted"}}
-    )
-    assert ruleset_queue_plans[0][2].get_nowait()[1] == "slack"
+    post("Demo rules multiple conditions any", {"i": 0})
+    assert ruleset_queue_plans[0][2].get_nowait()[1] == "debug"
+    post("Demo rules multiple conditions any", {"i": 1})
+    assert ruleset_queue_plans[0][2].get_nowait()[1] == "debug"
+
 
 @pytest.mark.asyncio
 async def test_generate_rules_multiple_conditions_all():
@@ -192,20 +205,42 @@ async def test_generate_rules_multiple_conditions_all():
     ruleset_queue_plans = [
         (ruleset, Queue(), asyncio.Queue()) for ruleset in rulesets
     ]
-    durable_rulesets = generate_rulesets(ruleset_queue_plans, dict(), inventory)
+    durable_rulesets = generate_rulesets(
+        ruleset_queue_plans, dict(), inventory
+    )
 
     print(durable_rulesets[0][0].define())
 
-    post(
-        "Demo rules multiple conditions all",
-        {"payload": {"provisioningState": "Succeeded"}},
-    )
+    post("Demo rules multiple conditions all", {"i": 0})
     assert ruleset_queue_plans[0][2].qsize() == 0
-    post(
-        "Demo rules multiple conditions all",
-        {"payload": {"provisioningState": "Deleted"}},
-    )
+    post("Demo rules multiple conditions all", {"i": 1})
     assert ruleset_queue_plans[0][2].qsize() == 1
-    assert ruleset_queue_plans[0][2].get_nowait()[1] == "slack"
+    assert ruleset_queue_plans[0][2].get_nowait()[1] == "debug"
 
 
+@pytest.mark.asyncio
+async def test_generate_rules_multiple_conditions_all_3():
+    os.chdir(HERE)
+    with open("rules_with_multiple_conditions3.yml") as f:
+        data = yaml.safe_load(f.read())
+    with open("inventory.yml") as f:
+        inventory = yaml.safe_load(f.read())
+
+    rulesets = parse_rule_sets(data)
+    print(rulesets)
+    ruleset_queue_plans = [
+        (ruleset, Queue(), asyncio.Queue()) for ruleset in rulesets
+    ]
+    durable_rulesets = generate_rulesets(
+        ruleset_queue_plans, dict(), inventory
+    )
+
+    print(durable_rulesets[0][0].define())
+
+    post("Demo rules multiple conditions reference assignment", {"i": 0})
+    assert ruleset_queue_plans[0][2].qsize() == 0
+    post("Demo rules multiple conditions reference assignment", {"i": 1})
+    assert ruleset_queue_plans[0][2].qsize() == 0
+    post("Demo rules multiple conditions reference assignment", {"i": 2})
+    assert ruleset_queue_plans[0][2].qsize() == 1
+    assert ruleset_queue_plans[0][2].get_nowait()[1] == "debug"

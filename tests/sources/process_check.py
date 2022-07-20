@@ -1,5 +1,6 @@
-import psutil
 import time
+
+import psutil
 
 
 def main(queue, args):
@@ -9,7 +10,9 @@ def main(queue, args):
     original_processes = {p.pid: p.name() for p in psutil.process_iter()}
     if names is not None:
         original_processes = {
-            pid: name for pid, name in original_processes.items() if name in names
+            pid: name
+            for pid, name in original_processes.items()
+            if name in names
         }
 
     while True:
@@ -17,10 +20,16 @@ def main(queue, args):
         current_processes = {p.pid: p.name() for p in psutil.process_iter()}
         if names is not None:
             current_processes = {
-                pid: name for pid, name in current_processes.items() if name in names
+                pid: name
+                for pid, name in current_processes.items()
+                if name in names
             }
-        new_processes = set(current_processes.keys()) - set(original_processes.keys())
-        lost_processes = set(original_processes.keys()) - set(current_processes.keys())
+        new_processes = set(current_processes.keys()) - set(
+            original_processes.keys()
+        )
+        lost_processes = set(original_processes.keys()) - set(
+            current_processes.keys()
+        )
         for new in new_processes:
             queue.put(
                 dict(
@@ -33,7 +42,9 @@ def main(queue, args):
             queue.put(
                 dict(
                     process_check=dict(
-                        pid=lost, name=original_processes[lost], status="stopped"
+                        pid=lost,
+                        name=original_processes[lost],
+                        status="stopped",
                     )
                 )
             )

@@ -1,15 +1,18 @@
 """
-lists_to_dicts.py:   An event filter that changes lists to dicts with integer indexes starting at 0.
+lists_to_dicts.py:   An event filter that changes lists to dicts with integer
+indexes starting at 0.
 
-For instance, the list ['a', 'b', 'c'] becomes the dict {0: 'a', 1: 'b': 2: 'c'}
+For instance, the list ['a', 'b', 'c'] becomes
+the dict {0: 'a', 1: 'b': 2: 'c'}
 
 """
 
 import logging
 
+
 def main(event):
     logger = logging.getLogger()
-    logger.info('lists_to_dicts')
+    logger.info("lists_to_dicts")
     q = []
     q.append(event)
     while q:

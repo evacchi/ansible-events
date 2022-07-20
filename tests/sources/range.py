@@ -1,12 +1,19 @@
+import asyncio
+from typing import Any, Dict
 
-def main(queue, args):
 
-    for i in range(int(args['limit'])):
-        queue.put(dict(i=i))
+async def main(queue: asyncio.Queue, args: Dict[str, Any]):
+    delay = args.get("delay", 0)
+
+    for i in range(int(args["limit"])):
+        await queue.put(dict(i=i))
+        await asyncio.sleep(delay)
+
 
 if __name__ == "__main__":
-    class MockQueue:
-        def put(self, event):
-            print(event)
-    main(MockQueue(), dict(limit=5))
 
+    class MockQueue:
+        async def put(self, event):
+            print(event)
+
+    asyncio.run(main(MockQueue(), dict(limit=5)))

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from typing import NamedTuple, Union, List, Any, Dict, Optional
-import ansible_events.condition_types as ct
-
 import asyncio
 from queue import Queue
+from typing import Any, Dict, List, NamedTuple, Union
+
+import ansible_events.condition_types as ct
+
 
 class EventSourceFilter(NamedTuple):
 
     filter_name: str
     filter_args: dict
+
 
 class EventSource(NamedTuple):
     name: str
@@ -57,12 +59,13 @@ class RuleSetPlan(NamedTuple):
     ruleset: RuleSet
     plan: asyncio.Queue
 
+
 class RuleSetQueue(NamedTuple):
     ruleset: RuleSet
     queue: Queue
+
 
 class RuleSetQueuePlan(NamedTuple):
     ruleset: RuleSet
     queue: Queue
     plan: asyncio.Queue
-

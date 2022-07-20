@@ -1,17 +1,15 @@
-pip==19.2.3
-bump2version==0.5.11
-wheel==0.33.6
-watchdog==0.9.0
-flake8==3.7.8
-tox==3.14.0
-coverage==4.5.4
-Sphinx==1.8.5
-twine==1.14.0
+-r requirements_test.txt
+-r requirements_lint.txt
 
-pytest==6.2.4
-pytest-asyncio
-black==21.7b0
-docopt==0.6.2
-psutil==5.9.0
-requests==2.27.1
-pytest-timeout==2.1.0
+bump2version
+
+# Packaging / distribution
+twine
+build
+
+# Testing
+tox
+coverage
+
+# Docs
+Sphinx
