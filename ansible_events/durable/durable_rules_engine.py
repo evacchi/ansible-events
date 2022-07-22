@@ -65,7 +65,7 @@ class DurableRulesEngine:
 
         try:
             resp = self.__last_resp.pop()
-            resp = { k:{'m':v} for (k,v) in resp.items() }
+            # resp = { k:{'m':v} for (k,v) in resp.items() }
             print(resp)
             # resp = { 'r_0': { 'm': resp['r_0'] }}
         except:
