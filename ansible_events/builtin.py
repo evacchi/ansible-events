@@ -14,9 +14,10 @@ from typing import Callable, Dict, List, Optional
 
 import ansible_runner
 import dpath.util
-import durable.lang
+import ansible_events.durable.lang
 import yaml
 
+from . import durable
 from .collection import find_playbook, has_playbook, split_collection_name
 from .conf import settings
 from .exception import ShutdownException
