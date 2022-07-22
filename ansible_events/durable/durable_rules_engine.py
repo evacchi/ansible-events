@@ -19,6 +19,7 @@ class DurableRulesEngine:
         # }
 
         req = {ruleset_name: json.loads(ruleset_string)}
+        print(req)
 
         r = requests.post(self.__host + '/create-durable-rules-executor', json=req)
         if r.status_code != 200:
