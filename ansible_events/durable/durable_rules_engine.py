@@ -82,6 +82,19 @@ class DurableRulesEngine:
 
         return json.dumps(resp)
 
+    def retract_fact(self, session_id, serialized_fact):
+        r = requests.post(f"{self.__host}/rules-durable-executors/{session_id}/retract-fact",
+                          json=json.loads(serialized_fact))
+        if r.status_code != 200:
+            raise Exception(
+                f"Invalid status code: {r.status_code} - {r.reason}\n"
+                + json.loads(r.content)['details'])
+
+        #self.__last_resp = r.json()
+        #self.__last_resp.reverse()
+
+        return (0, session_id)
+
 
 class error(Exception):
     # no doc
@@ -163,8 +176,8 @@ def renew_action_lease(*args, **kwargs):  # real signature unknown
     pass
 
 
-def retract_fact(*args, **kwargs):  # real signature unknown
-    raise Exception("retract_fact")
+def retract_fact(handle, payload):
+    return __instance.retract_fact(handle, payload)
 
 
 def retract_facts(*args, **kwargs):  # real signature unknown
