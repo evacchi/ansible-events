@@ -148,7 +148,8 @@ def get_events(*args, **kwargs):  # real signature unknown
 
 
 def get_facts(*args, **kwargs):  # real signature unknown
-    raise Exception("get_facts")
+    logging.warning("get_facts() not yet implemented. Ignoring.")
+    return "{}"
 
 
 def get_state(*args, **kwargs):  # real signature unknown
