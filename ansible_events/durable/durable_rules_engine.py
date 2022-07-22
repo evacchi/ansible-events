@@ -189,7 +189,8 @@ def set_store_message_callback(*args, **kwargs):  # real signature unknown
 
 
 def start_action(*args, **kwargs):
-    raise Exception("start_action")
+    logging.warning("start_action() not yet implemented. Ignoring.")
+    return None
 
 
 def start_action_for_state(handle, state_handle):
