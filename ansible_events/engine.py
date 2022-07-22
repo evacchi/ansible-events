@@ -8,10 +8,9 @@ import traceback
 from pprint import pformat
 from typing import Any, Dict, List, Optional, cast
 
-import durable.lang
-
 import ansible_events.rule_generator as rule_generator
 from ansible_events import durable
+from ansible_events.durable import lang
 from ansible_events.builtin import actions as builtin_actions
 from ansible_events.collection import (
     find_source,
