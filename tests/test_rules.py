@@ -8,7 +8,6 @@ import asyncio
 import os
 from queue import Queue
 
-import durable.lang
 import pytest
 import yaml
 
