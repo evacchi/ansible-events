@@ -95,6 +95,10 @@ class DurableRulesEngine:
 
         return (0, session_id)
 
+    def get_facts(self, session_id):
+        logging.warning("get_facts() not yet implemented. Ignoring.")
+        return "{}"
+
 
 class error(Exception):
     # no doc
@@ -163,10 +167,8 @@ def get_events(*args, **kwargs):  # real signature unknown
     return "{}"
 
 
-def get_facts(*args, **kwargs):  # real signature unknown
-    logging.warning("get_facts() not yet implemented. Ignoring.")
-    return "{}"
-
+def get_facts(session_id):  # real signature unknown
+    __instance.get_facts(session_id)
 
 def get_state(*args, **kwargs):  # real signature unknown
     pass
