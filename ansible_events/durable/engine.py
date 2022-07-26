@@ -396,7 +396,8 @@ class Ruleset(object):
         if sid != None:
             sid = str(sid)
 
-        return json.loads(durable_rules_engine.get_facts(self._handle, sid))
+        facts = durable_rules_engine.get_facts(self._handle, sid)
+        return json.loads(facts)
 
     def get_pending_events(self, sid):
         if sid != None:

@@ -32,10 +32,13 @@ class DurableRulesEngine:
         return id
 
     def assert_event(self, session_id, serialized_fact):
+        print("ASSERT evt")
         logging.warning("assert_event not yet implemented: using assert_fact")
         return self.assert_fact(session_id, serialized_fact)
 
     def assert_fact(self, session_id, serialized_fact):
+        print("ASSERT")
+
         r = requests.post(f"{self.__host}/rules-durable-executors/{session_id}/process",
                           json=json.loads(serialized_fact))
 
@@ -55,7 +58,6 @@ class DurableRulesEngine:
         #   "$s": 1
         # }
 
-        print(session_id)
         print(session_id)
 
         return (0, session_id)
@@ -83,6 +85,7 @@ class DurableRulesEngine:
         return json.dumps(resp)
 
     def retract_fact(self, session_id, serialized_fact):
+        print("RETRACT")
         r = requests.post(f"{self.__host}/rules-durable-executors/{session_id}/retract-fact",
                           json=json.loads(serialized_fact))
         if r.status_code != 200:
@@ -95,9 +98,17 @@ class DurableRulesEngine:
 
         return (0, session_id)
 
-    def get_facts(self, session_id):
-        logging.warning("get_facts() not yet implemented. Ignoring.")
-        return "{}"
+    c = 0
+
+    def get_facts(self, handle, session_id):
+        logging.warning("get_facts() not yet implemented. Mocked.")
+        self.c += 1
+        print("GET FACTS #" + str(self.c))
+        if self.c <= 1:
+            return "[]"
+        if 1 < self.c <= 5:
+            return """[{"j":null}]"""
+        return "[]"
 
 
 class error(Exception):
@@ -167,8 +178,8 @@ def get_events(*args, **kwargs):  # real signature unknown
     return "{}"
 
 
-def get_facts(session_id):  # real signature unknown
-    __instance.get_facts(session_id)
+def get_facts(handle, session_id):  # real signature unknown
+    return __instance.get_facts(handle, session_id)
 
 def get_state(*args, **kwargs):  # real signature unknown
     pass
