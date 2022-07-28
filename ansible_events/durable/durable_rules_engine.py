@@ -39,6 +39,12 @@ class DurableRulesEngine:
     def assert_fact(self, session_id, serialized_fact):
         print("ASSERT")
 
+        d = json.loads(serialized_fact)
+        if 'j' in serialized_fact:
+            d['j'] = 1
+
+        serialized_fact = json.dumps(d)
+
         r = requests.post(f"{self.__host}/rules-durable-executors/{session_id}/process",
                           json=json.loads(serialized_fact))
 
@@ -233,5 +239,6 @@ def start_timer(*args, **kwargs):  # real signature unknown
     pass
 
 
-def update_state(*args, **kwargs):  # real signature unknown
-    print("update_state", args, kwargs)
+def update_state(session_id, args):  # real signature unknown
+    print("update_state", session_id, args)
+    return session_id
