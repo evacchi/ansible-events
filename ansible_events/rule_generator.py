@@ -1,8 +1,8 @@
-from ansible_events.durable.lang import ruleset, rule, m, c, none
 import asyncio
 import logging
 from typing import Callable, Dict, List
 
+from ansible_events.durable.lang import ruleset, rule, m, c, none
 
 from ansible_events.condition_types import (
     Boolean,
@@ -160,8 +160,6 @@ def make_fn(
     def fn(c):
         logger = logging.getLogger()
         logger.info(f"calling {ansible_rule.name}")
-
-        print("RULE: ", ansible_rule)
         add_to_plan(
             ruleset,
             ansible_rule.action.action,

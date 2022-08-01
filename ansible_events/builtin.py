@@ -125,6 +125,7 @@ async def run_playbook(
     verbosity: int = 0,
     var_root: Optional[str] = None,
     copy_files: Optional[bool] = False,
+    json_mode: Optional[bool] = False,
     **kwargs,
 ):
     logger = logging.getLogger()
@@ -191,8 +192,19 @@ async def run_playbook(
             limit=host_limit,
             verbosity=verbosity,
             event_handler=event_callback,
+            json_mode=json_mode,
         ),
     )
+
+    for rc_file in glob.glob(os.path.join(temp, "artifacts", "*", "rc")):
+        with open(rc_file, "r") as f:
+            rc = int(f.read())
+
+    for status_file in glob.glob(
+        os.path.join(temp, "artifacts", "*", "status")
+    ):
+        with open(status_file, "r") as f:
+            status = f.read()
 
     if assert_facts or post_events:
         logger.debug("assert_facts")
@@ -206,7 +218,9 @@ async def run_playbook(
                 durable.lang.assert_fact(ruleset, fact)
             if post_events:
                 durable.lang.post(ruleset, fact)
-    await event_log.put(dict(type="Action", action="run_playbook"))
+    await event_log.put(
+        dict(type="Action", action="run_playbook", rc=rc, status=status)
+    )
 
 
 async def shutdown(

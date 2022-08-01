@@ -2,8 +2,6 @@ import asyncio
 import logging
 import os
 import runpy
-import asyncio
-import select
 import traceback
 from pprint import pformat
 from typing import Any, Dict, List, Optional, cast

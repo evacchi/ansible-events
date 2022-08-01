@@ -1,15 +1,12 @@
 from ansible_events import durable
 from ansible_events.durable.lang import m, c, assert_fact, ruleset, rule, when_all, post
-import ansible_events.durable
-import ansible_events.durable.lang
-import yaml
-import os
 import asyncio
 import os
 from queue import Queue
 
 import pytest
 import yaml
+from ansible_events.durable.lang import assert_fact, c, m, post, rule, ruleset, when_all
 
 from ansible_events.rule_generator import generate_rulesets
 from ansible_events.rules_parser import parse_rule_sets
