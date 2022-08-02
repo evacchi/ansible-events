@@ -3,6 +3,7 @@ import logging
 
 import requests
 
+_logger = logging.getLogger(__name__)
 
 class DurableRulesEngine:
     __host = None
@@ -33,7 +34,7 @@ class DurableRulesEngine:
 
     def assert_event(self, session_id, serialized_fact):
         print("ASSERT evt")
-        logging.warning("assert_event not yet implemented: using assert_fact")
+        _logger.warning("assert_event not yet implemented: using assert_fact")
         return self.assert_fact(session_id, serialized_fact)
 
     def assert_fact(self, session_id, serialized_fact):
@@ -82,7 +83,7 @@ class DurableRulesEngine:
         return ('{ "sid":"0", "id":"sid-0", "$s":1}', json.dumps(resp), handle)
 
     def complete_and_start_action(self, handle):  # real signature unknown
-        logging.info("complete_and_start_action", handle)
+        _logger.info("complete_and_start_action: %d", handle)
         try:
             resp = self.__last_resp.pop()
         except:
@@ -179,7 +180,7 @@ def delete_state(*args, **kwargs):  # real signature unknown
 
 
 def get_events(*args, **kwargs):  # real signature unknown
-    logging.warning("get_events() not yet implemented. Ignoring.")
+    _logger.warning("get_events() not yet implemented. Ignoring.")
     return "{}"
 
 
@@ -223,7 +224,7 @@ def set_store_message_callback(*args, **kwargs):  # real signature unknown
 
 
 def start_action(*args, **kwargs):
-    logging.warning("start_action() not yet implemented. Ignoring.")
+    _logger.warning("start_action() not yet implemented. Ignoring.")
     return None
 
 
